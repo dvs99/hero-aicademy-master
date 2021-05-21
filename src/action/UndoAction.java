@@ -7,4 +7,13 @@ public class UndoAction extends Action {
 		return "UndoAction []";
 	}
 
+	@Override
+	public int hashCode() {
+		return 3;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj != null && getClass() == obj.getClass();
+	}
 }

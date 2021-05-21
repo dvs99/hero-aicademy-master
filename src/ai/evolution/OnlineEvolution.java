@@ -1,5 +1,6 @@
 package ai.evolution;
 
+import ai.ntbea.OnlineEAVisualizable;
 import game.GameState;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import action.Action;
 import ai.AI;
 import ai.evaluation.IStateEvaluator;
 
-public class OnlineEvolution implements AI, AiVisualizor {
+public class OnlineEvolution implements AI, AiVisualizor, OnlineEAVisualizable {
 
 	public int popSize;
 	public int budget;
@@ -65,7 +66,6 @@ public class OnlineEvolution implements AI, AiVisualizor {
 
 	@Override
 	public Action act(GameState state, long ms) {
-
 		if (actions.isEmpty())
 			search(state);
 
@@ -145,7 +145,7 @@ public class OnlineEvolution implements AI, AiVisualizor {
 		}
 
 		//System.out.println("Best Genome: " + pop.get(0).actions);
-		//System.out.println("Visits: " + pop.get(0).visits);
+		//¡System.out.println("Visits: " + pop.get(0).visits);
 		//System.out.println("Value: " + pop.get(0).avgValue());
 
 		if (visualizor != null){
@@ -161,7 +161,8 @@ public class OnlineEvolution implements AI, AiVisualizor {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			};
+			}
+			System.out.println(title() + "-> Generations: " + g + ", best value: " + pop.get(0).value);
 		}
 		
 		actions = pop.get(0).actions;
@@ -248,9 +249,23 @@ public class OnlineEvolution implements AI, AiVisualizor {
 			OnlineEvolution evo = new OnlineEvolution(useHistory, popSize, mutRate, killRate, budget, evaluator.copy());
 			return evo;
 		}
-		
+
 		return new OnlineEvolution(useHistory, popSize, mutRate, killRate, budget, evaluator.copy());
-		
+
 	}
 
+	@Override
+	public Map<Integer, Double> getFitnesses() {
+		return fitnesses;
+	}
+
+	@Override
+	public List<List<Action>> getBestActions() {
+		return bestActions;
+	}
+
+	@Override
+	public void setPlotOverallBest(boolean value) {
+
+	}
 }

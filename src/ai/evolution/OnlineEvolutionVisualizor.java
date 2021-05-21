@@ -1,23 +1,19 @@
 package ai.evolution;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import ai.ntbea.OnlineEAVisualizable;
 import ui.UI;
-import util.Statistics;
 
 public class OnlineEvolutionVisualizor extends JComponent implements KeyListener {
 
@@ -33,11 +29,11 @@ public class OnlineEvolutionVisualizor extends JComponent implements KeyListener
 	
 	private int div;
 
-	private OnlineEvolution rolling;
+	private OnlineEAVisualizable rolling;
 	private List<Point> points;
 	private boolean control;
 	
-	public OnlineEvolutionVisualizor(UI ui, OnlineEvolution rolling) {
+	public OnlineEvolutionVisualizor(UI ui, OnlineEAVisualizable rolling) {
 		super();
 		this.ui = ui;
 		this.rolling = rolling;
@@ -68,24 +64,24 @@ public class OnlineEvolutionVisualizor extends JComponent implements KeyListener
 			double xprog;
 			int x;
 			int y;
-			double min = Collections.min(rolling.fitnesses.values());
-			double max = Collections.max(rolling.fitnesses.values());
+			double min = Collections.min(rolling.getFitnesses().values());
+			double max = Collections.max(rolling.getFitnesses().values());
 			double val;
 			List<Integer> keys = new ArrayList<Integer>();
-			keys.addAll(rolling.fitnesses.keySet());
+			keys.addAll(rolling.getFitnesses().keySet());
 			Collections.sort(keys);
 			
 			for(int gen : keys){
-				xprog =  ((double)gen)/((double)rolling.fitnesses.size());
+				xprog =  ((double)gen)/((double)rolling.getFitnesses().size());
 				x = (int) (div + (((double)(width-div-div)) * xprog));
-				val = rolling.fitnesses.get(gen);
+				val = rolling.getFitnesses().get(gen);
 				val = (val - min) / (max -min);
 				y = (int) ((height-div) - val * (height-div-div));
 				synchronized (this) {
 					points.add(new Point(x,y));
 				}
-				if (rolling.bestActions.size() > gen)
-					ui.setActionLayer(rolling.bestActions.get(gen));
+				if (rolling.getFitnesses().size() > gen)
+					ui.setActionLayer(rolling.getBestActions().get(gen));
 				if (!control){
 					repaint();
 					ui.repaint();

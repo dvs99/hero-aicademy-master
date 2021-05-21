@@ -2,11 +2,20 @@ package action;
 
 import model.Position;
 
+import java.util.Objects;
+
 public class UnitAction extends Action {
 
 	public Position from;
 	public Position to;
 	public UnitActionType type;
+
+	public static void main(String[] args) {
+		UnitAction ua1 = new UnitAction(new Position(1,2), new Position(1,4), UnitActionType.ATTACK);
+		UnitAction ua2 = new UnitAction(new Position(1,2), new Position(1,4), UnitActionType.ATTACK);
+		System.out.println(ua1.hashCode());
+		System.out.println(ua2.equals(ua1));
+	}
 
 	public UnitAction(Position from, Position to, UnitActionType type) {
 		super();
@@ -39,11 +48,14 @@ public class UnitAction extends Action {
 		return true;
 	}
 
-
+	@Override
+	public int hashCode() {
+		return Objects.hash(from, to, type);
+	}
 
 	@Override
 	public String toString() {
-		return "UnitAction [from=" + from + ", to=" + to + "]";
+		return "UnitAction [type= " + type + ", from=" + from + ", to=" + to + "]";
 	}
 
 }

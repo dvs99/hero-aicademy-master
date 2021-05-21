@@ -30,4 +30,8 @@ public class SwapCardAction extends Action {
 		return "SwapCardAction [card=" + card.name() + "]";
 	}
 
+	@Override
+	public int hashCode() {
+		return card.hashCode() + 1;
+	}
 }
