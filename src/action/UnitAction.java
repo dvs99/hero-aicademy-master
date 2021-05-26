@@ -50,7 +50,7 @@ public class UnitAction extends Action {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(from, to, type);
+		return from.hashCode()*1000 + to.hashCode()*10 + type.ordinal();
 	}
 
 	@Override

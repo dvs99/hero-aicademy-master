@@ -24,10 +24,7 @@ public class Position {
 	}
 
 	public int hashCode() {
-		int result = 1;
-		result = 5 * result + x;
-		result = 5 * result + y;
-		return result;
+		return x*9 + y;
 	}
 
 	@Override
