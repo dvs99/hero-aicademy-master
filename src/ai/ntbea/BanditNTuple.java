@@ -80,11 +80,12 @@ public class BanditNTuple {
     //Get the UCB for an arm.
     //Note that it will crash when called before adding anything to the bandit.
     //todo: prevent that crash, not really needed though.
+    // TODO: eValue random?
     public double ucb(Action[] x) {
         ActionArrayPattern key = new ActionArrayPattern().setPattern(x, tuplePositions);
         TupleStats armStats = armsMap.get(key);
         if (armStats != null)
-            return armStats.mean() + kFactor * Math.sqrt(Math.log(nSamples)/(armStats.n+eValue));
+            return armStats.mean() + kFactor * Math.sqrt(Math.log(1+nSamples)/(armStats.n+eValue));
         else
-            return kFactor * Math.sqrt(Math.log(nSamples)/(eValue)); }
+            return kFactor * Math.sqrt(Math.log(1+nSamples)/(eValue)); }
 }
