@@ -9,10 +9,8 @@ import java.util.List;
 public class BanditModel
 {
     private final ArrayList<BanditNTuple> bandits;
-    List<Action[]> sampled;
 
     public BanditModel(int searchSpaceDimensions, double kFactor, double eValue, boolean create2D, boolean create3D, boolean create4D, boolean createOnlyContiguous) {
-        sampled = new ArrayList<>();
         bandits = new ArrayList<>();
 
         //create 1D NTuples and add them to the bandit list
@@ -91,16 +89,20 @@ public class BanditModel
 
     //Reset the state of the whole model
     public BanditModel reset() {
-        sampled = new ArrayList<>();
         for (BanditNTuple nTuple : bandits)
             nTuple.reset();
         return this;
     }
 
     public void add(Action[] x, double v) {
-        sampled.add(x);
-        for (BanditNTuple tuple : bandits) {
-            tuple.add(x, v);
+        for (BanditNTuple bandit : bandits) {
+            bandit.add(x, v);
+        }
+    }
+
+    public void add(List<Action> x, double v) {
+        for (BanditNTuple bandit : bandits) {
+            bandit.add(x, v);
         }
     }
 
@@ -112,19 +114,11 @@ public class BanditModel
         return  totalUcb / bandits.size();
     }
 
-    public Action[] getBestOfSampled() {
-        double maxValue = Double.NEGATIVE_INFINITY;
-        Action[] bestTurn = null;
-        for (Action[] a : sampled) {
-            double currentValue = ucb(a);
-            if (maxValue<currentValue){
-                maxValue = currentValue;
-                bestTurn = a;
-            }
+    public double ucb(List<Action> x) {
+        double totalUcb = 0;
+        for (BanditNTuple bandit : bandits) {
+            totalUcb += bandit.ucb(x);
         }
-        return bestTurn;
+        return  totalUcb / bandits.size();
     }
-
-    //todo: implement
-    public Action[] getBestOfSampledPlusNeighbours(int nNeighbours) { return null;}
 }

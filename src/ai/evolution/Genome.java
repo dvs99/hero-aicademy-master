@@ -180,6 +180,14 @@ public abstract class Genome implements Comparable<Genome> {
 		return "Genome [value=" + value + ", visits="+ visits + ", fitness=" + fitness() + "]";
 	}
 
-	
-	
+	public void imitate(Genome other)
+	{
+		if (actions.size()==other.actions.size())
+			for (int i = 0; i<actions.size(); i++)
+				actions.set(i, other.actions.get(i));
+		else
+			actions = new ArrayList<>(other.actions);
+		value = other.value;
+		visits = other.visits;
+	}
 }

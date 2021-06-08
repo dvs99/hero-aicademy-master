@@ -9,29 +9,36 @@ import ai.evolution.OnlineEvolution;
 import ai.mcts.Mcts;
 import ai.ntbea.OnlineEAVisualizable;
 import ai.ntbea.OnlineNTBEA;
+import ai.ntbea.OnlineNTBEAGenomeBased;
 import ai.ntbea.UniformMutator;
 import ai.util.RAND_METHOD;
 import model.DECK_SIZE;
 import game.Game;
 import game.GameArguments;
 
+//TODO: games with the same seed
+//TODO: average evaluations
 public class Examples {
 
 	public static void main(String[] args) {
 		
 		//humanVsHuman();
 		//humanVsAI(4000);
-		AIVsAI(true, 1000);
+		AIVsAI(false, 2000);
 	}
 
 	private static void AIVsAI(boolean gfx, int budget) {
+		int p1Wins = 0;
+		int p2Wins = 0;
+
 		while (true) {
 			//Select p1 and p2
 			AI p1= new OnlineEvolution(true, 100, 0.1, 0.5, budget, new HeuristicEvaluator(false));
 			//AI p1 = new GreedyActionAI(new HeuristicEvaluator(false));
 			//AI p1 = new Mcts(budget, new RolloutEvaluator(1, 1, new RandomAI(RAND_METHOD.TREE), new HeuristicEvaluator(false)));
 			//AI p1 = new RandomAI(RAND_METHOD.BRUTE);
-			AI p2 = new OnlineNTBEA(budget, 150, 66, 0.01f, true, true, false, true, new HeuristicEvaluator(false), new UniformMutator());
+			//AI p1 = new OnlineNTBEA(budget, 150, 66, 0.01f, true, true, false, true, new HeuristicEvaluator(false), new UniformMutator());
+			AI p2 = new OnlineNTBEAGenomeBased(budget, 140, 1.45, 0.01f, false, false, false, true, new HeuristicEvaluator(false), new UniformMutator());
 
 			GameArguments gameArgs = new GameArguments(gfx, p1, p2, "a", DECK_SIZE.STANDARD);
 			gameArgs.budget = budget;
@@ -44,7 +51,13 @@ public class Examples {
 			//((OnlineEAVisualizable) p1).setPlotOverallBest(true);
 
 			game.run();
-			System.out.println("Winner: " + game.state.getWinner());
+
+			if (game.state.getWinner() == 1)
+				p1Wins++;
+			else if (game.state.getWinner() == 2)
+				p2Wins++;
+
+			System.out.println("Winner: " + game.state.getWinner() + ". " + game.player1.title() + " wins: " + p1Wins + ". " + game.player2.title() + " wins: " + p2Wins + ".");
 		}
 	}
 

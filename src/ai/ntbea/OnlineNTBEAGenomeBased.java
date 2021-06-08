@@ -6,12 +6,17 @@ import action.SingletonAction;
 import ai.AI;
 import ai.evaluation.IStateEvaluator;
 import ai.evolution.AiVisualizor;
+import ai.evolution.Genome;
 import ai.evolution.OnlineEvolutionVisualizor;
+import ai.evolution.WeakGenome;
 import ai.util.ActionPruner;
 import game.GameState;
 import ui.UI;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 //Implements the NTBEA algorithm to evolve a turn and play it
 //Note that it will only work properly as p2 for now
@@ -19,8 +24,9 @@ import java.util.*;
 //TODO: Make it work on 3-dimensional turns so it works properly on the first turn if its p1
 //TODO: try starting with online evolution
 //TODO: test what kFactors and eValues are adequate to properly balance exploration & exploitation
-//TODO: it seems like we are playing invalid actions sometimes, check why it's happening
-public class OnlineNTBEA implements AI, AiVisualizor, OnlineEAVisualizable {
+//TODO: it seems like we are playing invalid actions sometimes, check why it's happening? not sure if its happening withe genome based approach
+//TODO: prevent crash when the genome actions list is shorter then the needed length
+public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisualizable {
     private  BanditModel model = null;
     private  final ActionPruner pruner;
     private final IStateEvaluator evaluator;
@@ -31,7 +37,7 @@ public class OnlineNTBEA implements AI, AiVisualizor, OnlineEAVisualizable {
 
     private final int budget;
     private final int nNeighbours;
-    private final Action[] auxNeighbour;
+    private final Action[][] neighbourBuffer;
 
     private final double kFactor;
     private final double eValue;
@@ -46,10 +52,10 @@ public class OnlineNTBEA implements AI, AiVisualizor, OnlineEAVisualizable {
     private final List<List<Action>> bestActions;
     private Boolean plotOverallBest = true;
 
-    public OnlineNTBEA(int budget, int nNeighbours, double kFactor, double eValue, boolean use2D, boolean use3D, boolean use4D, boolean useOnlyContiguous, IStateEvaluator evaluator, Mutator mutator){
+    public OnlineNTBEAGenomeBased(int budget, int nNeighbours, double kFactor, double eValue, boolean use2D, boolean use3D, boolean use4D, boolean useOnlyContiguous, IStateEvaluator evaluator, Mutator mutator){
         turn = new ArrayList<>();
         pruner = new ActionPruner();
-        auxNeighbour = new Action[5];
+        neighbourBuffer = new Action[nNeighbours][5];
         this.mutator = mutator;
         this.evaluator = evaluator;
         this.budget = budget;
@@ -86,31 +92,24 @@ public class OnlineNTBEA implements AI, AiVisualizor, OnlineEAVisualizable {
 
     @Override
     public Action act(GameState state, long ms) {
+        //TODO fix turn 1
         if (state.turn ==1)
             return new EndTurnAction();
 
-        //NTEBEA not run yet on this turn
         if (turn.isEmpty())
             runEA(state);
 
-        //turn complete
-        if (i>= turn.size()){
-            i=0;
-            turn.clear();
-            return new EndTurnAction();
-        }
-
-        //play action
-        final Action next = turn.get(i);
-        i++;
-
-        return next ;
+        final Action next = turn.get(0);
+        turn.remove(0);
+        return next;
     }
 
 
     private void runEA(GameState state) {
-        fitnesses.clear();
-        bestActions.clear();
+        if (visualizor != null){
+            fitnesses.clear();
+            bestActions.clear();
+        }
 
         long start = System.currentTimeMillis();
         GameState stateCopy = new GameState(state.map);
@@ -123,59 +122,67 @@ public class OnlineNTBEA implements AI, AiVisualizor, OnlineEAVisualizable {
 
         //initial turn
         stateCopy.imitate(state);
-        Action[] current = getRandomValidTurn(stateCopy);
+        Genome currentGenome = new WeakGenome();
+        currentGenome.random(stateCopy);
 
         int evaluated = 0;
-        double bestTurnYetValue = Float.NEGATIVE_INFINITY;
-        Action[] bestTurnYet = new Action[5];
-        Action[] bestNeighbour = null;
+        double bestTurnYetFitness = Float.NEGATIVE_INFINITY;
+        ArrayList<Action> bestTurnYet = null;
+        double fitness;
+
+        double UCB;
+        double bestNeighbourUCB;
+        Genome bestNeighbourGenome = new WeakGenome();
+        Genome currentNeighbour = new WeakGenome();
 
         while (System.currentTimeMillis() < start + budget) {
             evaluated++;
 
-            stateCopy.imitate(state);//may be not necessary
-            stateCopy.update(Arrays.asList(current));//may be not necessary
+            stateCopy.imitate(state);
+            stateCopy.update(currentGenome.actions);
 
-            //evaluate current with the game and add the result to the model
-            double fitness = evaluator.eval(stateCopy, state.p1Turn);
-            model.add(current, fitness);
+            //evaluate current genome with the game and add the result to the model
+            fitness= evaluator.eval(stateCopy, state.p1Turn);
+            model.add(currentGenome.actions, fitness);
 
             //add graph values
             if (visualizor != null){
-                if (evaluated == 1 || bestTurnYetValue < fitness || !plotOverallBest) {
+                if (bestTurnYet == null || bestTurnYetFitness < fitness || !plotOverallBest) {
                     fitnesses.put(evaluated, fitness);
-                    bestActions.add(Arrays.stream(current).toList());
+                    bestActions.add(new ArrayList<>(currentGenome.actions));
                 } else {
-                    fitnesses.put(evaluated, bestTurnYetValue);
-                    bestActions.add(Arrays.stream(bestTurnYet).toList());
+                    fitnesses.put(evaluated, bestTurnYetFitness);
+                    bestActions.add(bestTurnYet);
                 }
             }
 
             //store best
-            if (fitness > bestTurnYetValue) {
-                bestTurnYet = current.clone();
-                bestTurnYetValue = fitness;
+            if (fitness > bestTurnYetFitness) {
+                bestTurnYet = new ArrayList<>(currentGenome.actions);
+                bestTurnYetFitness = fitness;
             }
 
 
             //explore neighbours
             //todo: filter duplicates somehow? use a history similar to the one in OnlineEvolution? prevent crash when setting 0 neighbours?
-            double bestNeighbourUCB = Float.NEGATIVE_INFINITY;
+            //todo: create mutateFrom on genome to prevent recreating the lists
+            bestNeighbourUCB = Float.NEGATIVE_INFINITY;
 
             for (int i = 0; i < nNeighbours; i++) {
                 stateCopy.imitate(state);
-                mutator.mutate(auxNeighbour, current, stateCopy);
-                double UCB = model.ucb(auxNeighbour);
+                currentNeighbour.imitate(currentGenome);
+                currentNeighbour.mutate(stateCopy);
+                UCB = model.ucb(currentNeighbour.actions);
                 if (UCB > bestNeighbourUCB){
-                    bestNeighbour = auxNeighbour;
+                    bestNeighbourGenome.imitate(currentNeighbour);
                     bestNeighbourUCB = UCB;
                 }
             }
-            current = bestNeighbour;
+            currentGenome = bestNeighbourGenome;
         }
 
         //final result
-        turn = new ArrayList<>(Arrays.stream(bestTurnYet).toList());
+        turn = bestTurnYet;
 
         //draw graph
         if (visualizor != null){
@@ -193,31 +200,7 @@ public class OnlineNTBEA implements AI, AiVisualizor, OnlineEAVisualizable {
                 }
             }
         }
-        System.out.println(title() + "-> Evaluated with game: " + evaluated + ", best value: " + bestTurnYetValue);
-    }
-
-
-    private Action[] getRandomValidTurn(GameState state) {
-        final List<Action> possible = new ArrayList<>();
-        final Action[] turn = new Action[5];
-        for (int i = 0; i < 5; i++){
-            if (state.isTerminal){
-                turn[i] = SingletonAction.endTurnAction;
-            }
-            else {
-                state.possibleActions(possible);
-                if (possible.isEmpty()){
-                    turn[i] = SingletonAction.endTurnAction;
-                }
-                else{
-                    pruner.prune(possible, state); //todo: understand it and decide if we should use it
-                    final int rnd = (int) (Math.random() * possible.size());
-                    turn[i] = possible.get(rnd);
-                    state.update(possible.get(rnd));
-                }
-            }
-        }
-        return turn;
+        System.out.println(title() + "-> Evaluated with game: " + evaluated + ", best value: " + bestTurnYetFitness);
     }
 
 
@@ -241,6 +224,6 @@ public class OnlineNTBEA implements AI, AiVisualizor, OnlineEAVisualizable {
 
     @Override
     public String title() {
-        return "OnlineNTBEA";
+        return "OnlineNTBEA(G)";
     }
 }

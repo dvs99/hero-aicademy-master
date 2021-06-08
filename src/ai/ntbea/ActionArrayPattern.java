@@ -6,6 +6,7 @@ import model.Position;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 //TODO: does this need to implement comparable?
 //TODO: test speed
@@ -42,6 +43,14 @@ public class ActionArrayPattern /*implements Comparable<ActionArrayPattern> */{
         v = new Action[ix.length];
         for (int i=0; i<ix.length; i++) {
             v[i] = x[ix[i]];
+        }
+        return this;
+    }
+
+    public ActionArrayPattern setPattern(List<Action> x, int[] ix) {
+        v = new Action[ix.length];
+        for (int i=0; i<ix.length; i++) {
+            v[i] = x.get(ix[i]);
         }
         return this;
     }

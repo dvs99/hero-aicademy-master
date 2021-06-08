@@ -162,9 +162,9 @@ public class OnlineEvolution implements AI, AiVisualizor, OnlineEAVisualizable {
 					e.printStackTrace();
 				}
 			}
-			System.out.println(title() + "-> Generations: " + g + ", best value: " + pop.get(0).value);
 		}
-		
+		System.out.println(title() + "-> Generations: " + g + ", best value: " + pop.get(0).value);
+
 		actions = pop.get(0).actions;
 		
 		generations.add((double)g);

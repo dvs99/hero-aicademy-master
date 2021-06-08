@@ -4,6 +4,7 @@ import action.Action;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
 
 //TODO: unit testing
@@ -50,8 +51,14 @@ public class BanditNTuple {
         nSamples++;
     }
 
+    public void add(List<Action> x, double v) {
+        TupleStats stats = getStatsForceCreate(x);
+        stats.add(v);
+        nSamples++;
+    }
 
-    //Method for printing the contents of the bandit. UNTESTED.
+
+    //Method for printing the contents of the bandit. WILL REQUIRE COMPARABLE IMPLEMENTATION OR A DIFFERENT APPROACH. UNTESTED.
     public void printArms() {
         TreeSet<ActionArrayPattern> orderedKeys = new TreeSet<>();
         orderedKeys.addAll(armsMap.keySet());
@@ -63,6 +70,17 @@ public class BanditNTuple {
 
     //Try to get the arm corresponding to the given action and the pattern of this bandit.
     public TupleStats getStatsForceCreate(Action[] x) {
+        ActionArrayPattern key = new ActionArrayPattern().setPattern(x, tuplePositions);
+        TupleStats stats = armsMap.get(key);
+        if (stats == null) {
+            stats = new TupleStats();
+            nEntries++;
+            armsMap.put(key, stats);
+        }
+        return stats;
+    }
+
+    public TupleStats getStatsForceCreate(List<Action> x) {
         ActionArrayPattern key = new ActionArrayPattern().setPattern(x, tuplePositions);
         TupleStats stats = armsMap.get(key);
         if (stats == null) {
@@ -88,4 +106,13 @@ public class BanditNTuple {
             return armStats.mean() + kFactor * Math.sqrt(Math.log(1+nSamples)/(armStats.n+eValue));
         else
             return kFactor * Math.sqrt(Math.log(1+nSamples)/(eValue)); }
+
+    public double ucb(List<Action> x) {
+        ActionArrayPattern key = new ActionArrayPattern().setPattern(x, tuplePositions);
+        TupleStats armStats = armsMap.get(key);
+        if (armStats != null)
+            return armStats.mean() + kFactor * Math.sqrt(Math.log(1+nSamples)/(armStats.n+eValue));
+        else
+            return kFactor * Math.sqrt(Math.log(1+nSamples)/(eValue));
+    }
 }
