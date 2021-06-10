@@ -35,7 +35,7 @@ public class Examples {
 			//AI p1 = new Mcts(budget, new RolloutEvaluator(1, 1, new RandomAI(RAND_METHOD.TREE), new HeuristicEvaluator(false)));
 			//AI p1 = new RandomAI(RAND_METHOD.BRUTE);
 			//AI p1 = new OnlineNTBEA(budget, 150, 66, 0.01f, true, true, false, true, new HeuristicEvaluator(false), new UniformMutator());
-			AI p2 = new OnlineNTBEAGenomeBased(budget, 140, 1.45, 0.01f, true, false, false, true, new HeuristicEvaluator(false), new UniformMutator());
+			AI p2 = new OnlineNTBEAGenomeBased(budget, 140, 1.45, 0.01f, true, false, false, true, new HeuristicEvaluator(false));
 
 			GameArguments gameArgs = new GameArguments(gfx, p1, p2, "a", DECK_SIZE.STANDARD);
 			gameArgs.budget = budget;

@@ -29,7 +29,6 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
     private  int modelDimensions = 0;
     private  final ActionPruner pruner;
     private final IStateEvaluator evaluator;
-    private final Mutator mutator;
 
     private ArrayList<Action> turn; //todo: maybe change to array or non mutable list for efficiency
     private int i;
@@ -50,10 +49,9 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
     private final List<List<Action>> bestActions;
     private Boolean plotOverallBest = true;
 
-    public OnlineNTBEAGenomeBased(int budget, int nNeighbours, double kFactor, double eValue, boolean use2D, boolean use3D, boolean use4D, boolean useOnlyContiguous, IStateEvaluator evaluator, Mutator mutator){
+    public OnlineNTBEAGenomeBased(int budget, int nNeighbours, double kFactor, double eValue, boolean use2D, boolean use3D, boolean use4D, boolean useOnlyContiguous, IStateEvaluator evaluator){
         turn = new ArrayList<>();
         pruner = new ActionPruner();
-        this.mutator = mutator;
         this.evaluator = evaluator;
         this.budget = budget;
         this.nNeighbours = nNeighbours;

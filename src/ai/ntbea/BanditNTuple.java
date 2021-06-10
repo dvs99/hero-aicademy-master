@@ -64,7 +64,7 @@ public class BanditNTuple {
         orderedKeys.addAll(armsMap.keySet());
         for (ActionArrayPattern key : orderedKeys) {
             TupleStats ss = armsMap.get(key);
-            System.out.println(key + "\t " + ss.n() + "\t " + ss.mean() + "\t " + ss.sd());
+            System.out.println(key + "\t " + ss.n() + "\t " + ss.mean());
         }
     }
 
