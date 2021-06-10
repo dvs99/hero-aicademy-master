@@ -24,13 +24,10 @@ public class Examples {
 		
 		//humanVsHuman();
 		//humanVsAI(4000);
-		AIVsAI(false, 2000);
+		AIVsAI(false, 8000);
 	}
 
 	private static void AIVsAI(boolean gfx, int budget) {
-		int p1Wins = 0;
-		int p2Wins = 0;
-
 		while (true) {
 			//Select p1 and p2
 			AI p1= new OnlineEvolution(true, 100, 0.1, 0.5, budget, new HeuristicEvaluator(false));
@@ -38,7 +35,7 @@ public class Examples {
 			//AI p1 = new Mcts(budget, new RolloutEvaluator(1, 1, new RandomAI(RAND_METHOD.TREE), new HeuristicEvaluator(false)));
 			//AI p1 = new RandomAI(RAND_METHOD.BRUTE);
 			//AI p1 = new OnlineNTBEA(budget, 150, 66, 0.01f, true, true, false, true, new HeuristicEvaluator(false), new UniformMutator());
-			AI p2 = new OnlineNTBEAGenomeBased(budget, 140, 1.45, 0.01f, false, false, false, true, new HeuristicEvaluator(false), new UniformMutator());
+			AI p2 = new OnlineNTBEAGenomeBased(budget, 140, 1.45, 0.01f, true, false, false, true, new HeuristicEvaluator(false), new UniformMutator());
 
 			GameArguments gameArgs = new GameArguments(gfx, p1, p2, "a", DECK_SIZE.STANDARD);
 			gameArgs.budget = budget;
@@ -51,13 +48,6 @@ public class Examples {
 			//((OnlineEAVisualizable) p1).setPlotOverallBest(true);
 
 			game.run();
-
-			if (game.state.getWinner() == 1)
-				p1Wins++;
-			else if (game.state.getWinner() == 2)
-				p2Wins++;
-
-			System.out.println("Winner: " + game.state.getWinner() + ". " + game.player1.title() + " wins: " + p1Wins + ". " + game.player2.title() + " wins: " + p2Wins + ".");
 		}
 	}
 

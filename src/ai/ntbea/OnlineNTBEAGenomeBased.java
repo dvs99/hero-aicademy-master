@@ -24,10 +24,9 @@ import java.util.Map;
 //TODO: Make it work on 3-dimensional turns so it works properly on the first turn if its p1
 //TODO: try starting with online evolution
 //TODO: test what kFactors and eValues are adequate to properly balance exploration & exploitation
-//TODO: it seems like we are playing invalid actions sometimes, check why it's happening? not sure if its happening withe genome based approach
-//TODO: prevent crash when the genome actions list is shorter then the needed length
 public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisualizable {
     private  BanditModel model = null;
+    private  int modelDimensions = 0;
     private  final ActionPruner pruner;
     private final IStateEvaluator evaluator;
     private final Mutator mutator;
@@ -37,7 +36,6 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
 
     private final int budget;
     private final int nNeighbours;
-    private final Action[][] neighbourBuffer;
 
     private final double kFactor;
     private final double eValue;
@@ -55,7 +53,6 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
     public OnlineNTBEAGenomeBased(int budget, int nNeighbours, double kFactor, double eValue, boolean use2D, boolean use3D, boolean use4D, boolean useOnlyContiguous, IStateEvaluator evaluator, Mutator mutator){
         turn = new ArrayList<>();
         pruner = new ActionPruner();
-        neighbourBuffer = new Action[nNeighbours][5];
         this.mutator = mutator;
         this.evaluator = evaluator;
         this.budget = budget;
@@ -92,9 +89,6 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
 
     @Override
     public Action act(GameState state, long ms) {
-        //TODO fix turn 1
-        if (state.turn ==1)
-            return new EndTurnAction();
 
         if (turn.isEmpty())
             runEA(state);
@@ -114,16 +108,20 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
         long start = System.currentTimeMillis();
         GameState stateCopy = new GameState(state.map);
 
-        //create or reset the model as needed
-        if (model == null)
-            model = new BanditModel(5, kFactor, eValue, use2D, use3D, use4D, useOnlyContiguous);
-        else
-            model.reset();
-
         //initial turn
         stateCopy.imitate(state);
         Genome currentGenome = new WeakGenome();
         currentGenome.random(stateCopy);
+
+        //create or reset the model as needed
+
+        if (model == null || modelDimensions != currentGenome.actions.size()-1)
+        {
+            model = new BanditModel(currentGenome.actions.size()-1, kFactor, eValue, use2D, use3D, use4D, useOnlyContiguous);
+            modelDimensions =  currentGenome.actions.size()-1;
+        }
+        else
+            model.reset();
 
         int evaluated = 0;
         double bestTurnYetFitness = Float.NEGATIVE_INFINITY;

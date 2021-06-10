@@ -32,25 +32,20 @@ public class ActionArrayPattern /*implements Comparable<ActionArrayPattern> */{
         System.out.println(test);
     }
 
-    public Action[] v;
-
-    public ActionArrayPattern setPattern(Action[] v) {
-        this.v = v;
-        return this;
-    }
+    public int[] v;
 
     public ActionArrayPattern setPattern(Action[] x, int[] ix) {
-        v = new Action[ix.length];
+        v = new int[ix.length];
         for (int i=0; i<ix.length; i++) {
-            v[i] = x[ix[i]];
+            v[i] = x[ix[i]].hashCode();
         }
         return this;
     }
 
     public ActionArrayPattern setPattern(List<Action> x, int[] ix) {
-        v = new Action[ix.length];
+        v = new int[ix.length];
         for (int i=0; i<ix.length; i++) {
-            v[i] = x.get(ix[i]);
+            v[i] = x.get(ix[i]).hashCode();
         }
         return this;
     }
@@ -63,7 +58,7 @@ public class ActionArrayPattern /*implements Comparable<ActionArrayPattern> */{
         try {
             ActionArrayPattern p = (ActionArrayPattern) pattern;
             for (int i = 0; i < v.length; i++) {
-                if (!v[i].equals(p.v[i])) return false;
+                if (v[i] != p.v[i]) return false;
             }
             return true;
         } catch (Exception e) {
