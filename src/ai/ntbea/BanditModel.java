@@ -13,8 +13,6 @@ public class BanditModel
     public BanditModel(int searchSpaceDimensions, double kFactor, double eValue, boolean create2D, boolean create3D, boolean create4D, boolean createOnlyContiguous) {
         bandits = new ArrayList<>();
 
-        System.out.println(searchSpaceDimensions);
-
         //create 1D NTuples and add them to the bandit list
         for (int i = 0; i < searchSpaceDimensions; i++) {
             int[] posArray = new int[]{i};
