@@ -10,14 +10,15 @@ public class BanditModel
 {
     private final ArrayList<BanditNTuple> bandits;
 
-    public BanditModel(int searchSpaceDimensions, double kFactor, double eValue, boolean create2D, boolean create3D, boolean create4D, boolean createOnlyContiguous) {
+    public BanditModel(int searchSpaceDimensions, double kFactor, double eValue, boolean create1D, boolean create2D, boolean create3D, boolean create4D, boolean createND, boolean createOnlyContiguous) {
         bandits = new ArrayList<>();
 
         //create 1D NTuples and add them to the bandit list
-        for (int i = 0; i < searchSpaceDimensions; i++) {
-            int[] posArray = new int[]{i};
-            bandits.add(new BanditNTuple(posArray, kFactor, eValue));
-        }
+        if (create1D)
+            for (int i = 0; i < searchSpaceDimensions; i++) {
+                int[] posArray = new int[]{i};
+                bandits.add(new BanditNTuple(posArray, kFactor, eValue));
+            }
 
         //create 2D NTuples and add them to the bandit list
         if (create2D && searchSpaceDimensions>=2) {
@@ -80,11 +81,13 @@ public class BanditModel
         }
 
         //Create the complete NTuple and add it to the list
-        int[] posArray = new int[searchSpaceDimensions];
-        for (int i = 0; i < posArray.length; i++) {
-            posArray[i] = i;
-        }
+        if (createND){
+            int[] posArray = new int[searchSpaceDimensions];
+            for (int i = 0; i < posArray.length; i++) {
+                posArray[i] = i;
+            }
         bandits.add(new BanditNTuple(posArray, kFactor, eValue));
+        }
     }
 
     //Reset the state of the whole model

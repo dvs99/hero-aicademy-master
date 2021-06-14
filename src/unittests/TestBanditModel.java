@@ -9,11 +9,11 @@ public class TestBanditModel
 {
     public static void main(String[] args)
     {
-        BanditModel bm1d = new BanditModel(5, 1.4, 0.01, false, false, false, false);
-        BanditModel bm2d = new BanditModel(5, 1.4, 0.01, true, false, false, false);
-        BanditModel bm3d = new BanditModel(5, 1.4, 0.01, true, true, false, false);
-        BanditModel bm4d = new BanditModel(5, 1.4, 0.01, true, true, true, false);
-        BanditModel bm2dcont = new BanditModel(5, 1.4, 0.01, true, false, false, true);
+        BanditModel bm1d = new BanditModel(5, 1.4, 0.01, true,false, false, false, false, true);
+        BanditModel bm2d = new BanditModel(5, 1.4, 0.01, true,true, false, false, false, true);
+        BanditModel bm3d = new BanditModel(5, 1.4, 0.01, true,true, true, false, false, true);
+        BanditModel bm4d = new BanditModel(5, 1.4, 0.01, true,true, true, true, false, true);
+        BanditModel bm2dcont = new BanditModel(5, 1.4, 0.01, true, true, false, false, true, true);
 
         Action a1 = new UnitAction(new Position(0, 0), new Position(1, 2), UnitActionType.MOVE);
         Action a2 = new UnitAction(new Position(0, 0), new Position(1, 2), UnitActionType.ATTACK);

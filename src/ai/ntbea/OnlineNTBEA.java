@@ -36,9 +36,11 @@ public class OnlineNTBEA implements AI, AiVisualizor, OnlineEAVisualizable {
     private final double kFactor;
     private final double eValue;
 
+    private final boolean use1D;
     private final boolean use2D;
     private final boolean use3D;
     private final boolean use4D;
+    private final boolean useND;
     private final boolean useOnlyContiguous;
 
     private OnlineEvolutionVisualizor visualizor;
@@ -46,7 +48,7 @@ public class OnlineNTBEA implements AI, AiVisualizor, OnlineEAVisualizable {
     private final List<List<Action>> bestActions;
     private Boolean plotOverallBest = true;
 
-    public OnlineNTBEA(int budget, int nNeighbours, double kFactor, double eValue, boolean use2D, boolean use3D, boolean use4D, boolean useOnlyContiguous, IStateEvaluator evaluator, Mutator mutator){
+    public OnlineNTBEA(int budget, int nNeighbours, double kFactor, double eValue, boolean use1D, boolean use2D, boolean use3D, boolean use4D, boolean useND, boolean useOnlyContiguous, IStateEvaluator evaluator, Mutator mutator){
         turn = new ArrayList<>();
         pruner = new ActionPruner();
         auxNeighbour = new Action[5];
@@ -56,9 +58,11 @@ public class OnlineNTBEA implements AI, AiVisualizor, OnlineEAVisualizable {
         this.nNeighbours = nNeighbours;
         this.kFactor = kFactor;
         this.eValue = eValue;
+        this.use1D = use1D;
         this.use2D = use2D;
         this.use3D = use3D;
         this.use4D = use4D;
+        this.useND = useND;
         this.useOnlyContiguous = useOnlyContiguous;
         this.fitnesses = new HashMap<>();
         this.bestActions = new ArrayList<>();
@@ -117,7 +121,7 @@ public class OnlineNTBEA implements AI, AiVisualizor, OnlineEAVisualizable {
 
         //create or reset the model as needed
         if (model == null)
-            model = new BanditModel(5, kFactor, eValue, use2D, use3D, use4D, useOnlyContiguous);
+            model = new BanditModel(5, kFactor, eValue, use1D, use2D, use3D, use4D, useND, useOnlyContiguous);
         else
             model.reset();
 

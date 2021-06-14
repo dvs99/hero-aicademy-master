@@ -15,9 +15,9 @@ public class TestAIvsAI
 
     public static void main(String[] args)
     {
-        runTest(true, 8000,
-                new OnlineEvolution(true, 100, 0.1, 0.5, 8000, new HeuristicEvaluator(false)),
-                new OnlineNTBEAGenomeBased(8000, 500, 1.45, 0.01f, true, true, true, true, new HeuristicEvaluator(false), new UniformMutator()),
+        runTest(true, 6000,
+                new OnlineEvolution(true, 100, 0.1, 0.5, 6000, new HeuristicEvaluator(false)),
+                new OnlineNTBEAGenomeBased(6000, 150, 1.45, 0.01f, false, true, false, false, false, true, new HeuristicEvaluator(false)),
                 2);
     }
 
