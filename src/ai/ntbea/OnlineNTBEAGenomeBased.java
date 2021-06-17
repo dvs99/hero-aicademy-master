@@ -204,7 +204,7 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
                 }
             }
         }
-        System.out.println(title() + "-> Evaluated with game: " + evaluated + ", best value: " + bestTurnYetFitness);
+        //System.out.println(title() + "-> Evaluated with game: " + evaluated + ", best value: " + bestTurnYetFitness);
     }
 
     @Override
