@@ -95,9 +95,13 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
         if (turn.isEmpty())
             runEA(state);
 
-        final Action next = turn.get(0);
-        turn.remove(0);
-        return next;
+        if (!turn.isEmpty()){
+            final Action next = turn.get(0);
+            turn.remove(0);
+            return next;
+        }
+        else
+            return new EndTurnAction();
     }
 
 
@@ -224,6 +228,6 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
 
     @Override
     public String title() {
-        return "OnlineNTBEA(G)";
+        return "OnlineNTBEA(G)" + use2D;
     }
 }
