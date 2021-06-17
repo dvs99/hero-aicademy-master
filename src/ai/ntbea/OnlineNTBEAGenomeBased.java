@@ -39,11 +39,11 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
     private final double kFactor;
     private final double eValue;
 
-    private boolean use1D;
+    private final boolean use1D;
     private final boolean use2D;
     private final boolean use3D;
     private final boolean use4D;
-    private boolean useND;
+    private final boolean useND;
     private final boolean useOnlyContiguous;
 
     private OnlineEvolutionVisualizor visualizor;
@@ -207,7 +207,6 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
         System.out.println(title() + "-> Evaluated with game: " + evaluated + ", best value: " + bestTurnYetFitness);
     }
 
-
     @Override
     public void init(GameState state, long ms) {
         i=0;
@@ -228,6 +227,6 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
 
     @Override
     public String title() {
-        return "OnlineNTBEA(G)" + use2D;
+        return "OnlineNTBEA(G)" + (use1D? "1D" : "") + (use2D? "2D" : "") + (use3D? "3D" : "") + (use4D? "4D" : "") + (useND? "nD" : "") + (useOnlyContiguous? "OC" : "") + "N" + nNeighbours + "K" + kFactor + "E" + eValue;
     }
 }
