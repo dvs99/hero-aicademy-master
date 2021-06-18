@@ -38,18 +38,39 @@ public class Tournament
 
         for (String bot_main: l_bots_main)
             for (String bot_sub : l_bots_sub)
-                 for (Integer budget : l_budgets)
+            {
+                boolean early_abort_budget = false;
+                int bot_main_wins = 0;
+                int bot_sub_wins = 0;
+                for (Integer budget : l_budgets)
+                {
+                    if (!early_abort_budget)
                     {
                         for (int igame = 0; igame < n_games; igame++)
-                            PlayGame(bot_main, bot_sub, budget, writer);
+                        {
+                            int winner = PlayGame(bot_main, bot_sub, budget, writer);
+                            if (winner == 1)
+                                bot_main_wins++;
+                            else if (winner == 2)
+                                bot_sub_wins++;
+                        }
                         for (int igame = 0; igame < n_games; igame++)
-                            PlayGame(bot_sub, bot_main, budget, writer);
+                        {
+                            int winner = PlayGame(bot_sub, bot_main, budget, writer);
+                            if (winner == 1)
+                                bot_sub_wins++;
+                            else if (winner == 2)
+                                bot_main_wins++;
+                        }
+                        if (bot_main_wins == n_games * 2 || bot_sub_wins == n_games * 2)
+                            early_abort_budget = true;
                     }
-
+                }
+            }
         writer.close();
     }
 
-    private void PlayGame(String bot1_name, String bot2_name, int budget, PrintWriter writer)
+    private int PlayGame(String bot1_name, String bot2_name, int budget, PrintWriter writer)
     {
         AI bot1;
         AI bot2;
@@ -71,6 +92,7 @@ public class Tournament
 
         writer.println(s);
         writer.flush();
+        return  winner;
     }
 
     private AI GetBot(String name, int budget)

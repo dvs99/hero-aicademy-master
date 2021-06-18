@@ -28,7 +28,7 @@ public class Experiment
         l_budgets.add(6000);
         l_budgets.add(10000);
 
-        n_games = 10;
+        n_games = 100;
 
         String output_file = "testResults//exp.txt";
 

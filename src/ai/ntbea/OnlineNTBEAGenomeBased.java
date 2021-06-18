@@ -91,6 +91,8 @@ public class OnlineNTBEAGenomeBased implements AI, AiVisualizor, OnlineEAVisuali
 
     @Override
     public Action act(GameState state, long ms) {
+        if (turn == null) //i don't know why this got called with turn == null but it happened and caused a crash
+            return new EndTurnAction();
 
         if (turn.isEmpty())
             runEA(state);
